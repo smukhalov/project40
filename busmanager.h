@@ -27,7 +27,7 @@ private:
 	size_t last_init_id;
 	bool logging = true;
 
-	struct BusVertex{
+	/*struct BusVertex{
 		std::string bus_name;
 		size_t vertex_id;
 
@@ -62,12 +62,13 @@ private:
 		}
 
 		std::hash<std::string> shash;
-	};
+	};*/
 
 	std::unordered_map<std::string, std::unordered_set<size_t>> stop_to_vertex_list;
+	std::unordered_map<size_t, std::string> vertex_to_stop;
 
-	std::unordered_map<size_t, std::unordered_set<BusStop, BusStopHasher>> vertex_to_bus_stop;
-	std::unordered_map<BusStop, size_t, BusStopHasher> bus_stop_to_vertex;
+	//std::unordered_map<size_t, std::unordered_set<BusStop, BusStopHasher>> vertex_to_bus_stop;
+	//std::unordered_map<BusStop, size_t, BusStopHasher> bus_stop_to_vertex;
 
 	//std::unordered_map<std::string, std::unordered_set<BusVertex, BusVertexHasher>> stop_to_bus_vertex;
 
