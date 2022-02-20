@@ -118,4 +118,7 @@ private:
 
 	double GetDistance(std::vector<std::string>::const_iterator it) const;
 	void AddEdge(const Edge& edge);
+
+	void ProcessingStop(const Bus::Stop& stop, size_t stop_order);
+	void ProcessingStopBack(const Bus::Stop& stop, size_t stop_order);
 };
