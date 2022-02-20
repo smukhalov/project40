@@ -48,28 +48,28 @@ private:
 
 	struct BusStop{
 		std::string bus_name;
-		size_t stop_id;
 		std::string stop_name;
 
 		bool operator == (const BusStop& other) const {
-			return bus_name == other.bus_name && stop_id == other.stop_id;
+			return bus_name == other.bus_name && stop_name == other.stop_name;
 		}
 	};
 
 	struct BusStopHasher {
 		size_t operator() (const BusStop& bs) const {
 			size_t x = 2'946'901;
-			return shash(bs.bus_name) * x + size_t_hash(bs.stop_id);
+			return shash(bs.bus_name) * x + shash(bs.stop_name);
 		}
 
 		std::hash<std::string> shash;
-		std::hash<size_t> size_t_hash;
 	};
+
+	std::unordered_map<std::string, std::unordered_set<size_t>> stop_to_vertex_list;
 
 	std::unordered_map<size_t, std::unordered_set<BusStop, BusStopHasher>> vertex_to_bus_stop;
 	std::unordered_map<BusStop, size_t, BusStopHasher> bus_stop_to_vertex;
 
-	std::unordered_map<std::string, std::unordered_set<BusVertex, BusVertexHasher>> stop_to_bus_vertex;
+	//std::unordered_map<std::string, std::unordered_set<BusVertex, BusVertexHasher>> stop_to_bus_vertex;
 
 	struct Edge {
 	    size_t from;
@@ -119,6 +119,6 @@ private:
 	double GetDistance(std::vector<std::string>::const_iterator it) const;
 	void AddEdge(const Edge& edge);
 
-	void ProcessingStop(const Bus::Stop& stop, size_t stop_order);
-	void ProcessingStopBack(const Bus::Stop& stop, size_t stop_order);
+	void ProcessingStop(const std::string& stop_name, size_t stop_order);
+	void ProcessingStopBack(const std::string& stop_name, size_t stop_order);
 };
