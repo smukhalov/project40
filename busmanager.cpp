@@ -328,7 +328,7 @@ void BusManager::WriteResponse(std::ostream& out) const {
 	}
 
 	Graph::Router<double> router(graph);
-	return;
+	//return;
 
 	//out << std::fixed << std::setprecision(6) << "[\n";
 	out << "[\n";
@@ -873,9 +873,9 @@ void BusManager::ProcessingStop(const std::string& stop_name, size_t stop_order)
 		stop_to_vertex_list[stop_name].insert(vertex_from);
 		vertex_to_stop.insert({vertex_from, stop_name});
 
-		size_t vertex_to = last_init_id;
+		/*size_t vertex_to = last_init_id;
 		double distance = 1.0 + stop_order;
-		AddEdge({vertex_from, vertex_to, distance, RouteItemType::Bus});
+		AddEdge({vertex_from, vertex_to, distance, RouteItemType::Bus});*/
 
 		return;
 	}
