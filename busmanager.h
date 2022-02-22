@@ -114,12 +114,14 @@ private:
 		const Graph::DirectedWeightedGraph<double>& graph,
 		Graph::Router<double>& router) const;
 
-	void FillEdgesLine(const Bus& bus);
-	void FillEdgesRound(const Bus& bus);
+	//void FillEdgesLine(const Bus& bus);
+	//void FillEdgesRound(const Bus& bus);
 
 	double GetDistance(std::vector<std::string>::const_iterator it) const;
 	void AddEdge(const Edge& edge);
 
 	void ProcessingStop(const std::string& stop_name, size_t stop_order);
 	void ProcessingStopBack(const std::string& stop_name, size_t stop_order);
+
+	double GetDistance(const std::string& stop_name, const std::string& stop_name_next) const;
 };

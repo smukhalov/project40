@@ -873,9 +873,68 @@ void BusManager::ProcessingStop(const std::string& stop_name, size_t stop_order)
 		stop_to_vertex_list[stop_name].insert(vertex_from);
 		vertex_to_stop.insert({vertex_from, stop_name});
 
-		/*size_t vertex_to = last_init_id;
-		double distance = 1.0 + stop_order;
-		AddEdge({vertex_from, vertex_to, distance, RouteItemType::Bus});*/
+		return;
+	}
+
+	std::unordered_map<std::string, std::vector<std::string>> bus_groups_next; //buses for next of next stops
+	for(const auto& [stop_name_next, buses_by_stop_next]: bus_groups){
+		for(const std::string& bus_name: buses_by_stop_next){
+			const Bus& bus = buses.at(bus_name);
+
+			if(bus.stops.size() - 2 == stop_order){
+				continue;
+			}
+
+			const std::vector<std::string>& stops = bus.stops;
+			bus_groups_next[stops[stop_order+2]].push_back(bus_name);
+		}
+
+		if(bus_groups_next.size() == 0){
+			bus_groups_next = bus_groups;
+		}
+
+		size_t vertex_from = last_init_id++;
+		stop_to_vertex_list[stop_name].insert(vertex_from);
+		vertex_to_stop.insert({vertex_from, stop_name});
+
+		for(const auto& _: bus_groups_next){
+			size_t vertex_to = last_init_id++;
+
+			//double distance = 1.0 + stop_order;
+			double distance = GetDistance(stop_name, stop_name_next);
+			AddEdge({vertex_from, vertex_to, distance, RouteItemType::Bus});
+		}
+
+		last_init_id--;
+		ProcessingStop(stop_name_next, stop_order + 1);
+	}
+}
+
+void BusManager::ProcessingStopBack(const std::string& stop_name, size_t stop_order){
+	std::set<std::string>& buses_by_stop = stop_to_buses.at(stop_name);
+
+	std::unordered_set<std::string> stops_next;
+	std::unordered_map<std::string, std::vector<std::string>> bus_groups; //buses for next stops
+	std::vector<std::string> bus_groups_this; //current stop is last for buses
+
+	for(const std::string& bus_name: buses_by_stop){
+		const Bus& bus = buses.at(bus_name);
+
+		if(bus.stops.size() - 1 == stop_order){
+			bus_groups_this.push_back(bus_name);
+			continue;
+		}
+
+		const std::vector<std::string>& stops = bus.stops;
+		size_t last_number = stops.size() - 1;
+
+		bus_groups[stops[last_number - (stop_order+1)]].push_back(bus_name);
+	}
+
+	if(bus_groups.size() == 0){ //last stop
+		size_t vertex_from = last_init_id++;
+		stop_to_vertex_list[stop_name].insert(vertex_from);
+		vertex_to_stop.insert({vertex_from, stop_name});
 
 		return;
 	}
@@ -904,15 +963,25 @@ void BusManager::ProcessingStop(const std::string& stop_name, size_t stop_order)
 		for(const auto& _: bus_groups_next){
 			size_t vertex_to = last_init_id++;
 
-			double distance = 1.0 + stop_order;
+			//double distance = 1.0 + stop_order;
+			double distance = GetDistance(stop_name, stop_name_next);
 			AddEdge({vertex_from, vertex_to, distance, RouteItemType::Bus});
 		}
 
 		last_init_id--;
-		ProcessingStop(stop_name_next, stop_order + 1);
+		ProcessingStopBack(stop_name_next, stop_order + 1);
 	}
 }
 
-void BusManager::ProcessingStopBack(const std::string& stop_name, size_t stop_order){
-	//TODO!!
+double BusManager::GetDistance(const std::string& stop_name, const std::string& stop_name_next) const {
+	auto it_stop = stop_distances.find({stop_name, stop_name_next});
+
+	if(it_stop == stop_distances.end()){
+		it_stop = stop_distances.find({stop_name, stop_name_next});
+		if(it_stop == stop_distances.end()){
+			throw std::invalid_argument("GetDistnace. distance [" + stop_name + ", " + stop_name_next + "] not found");
+		}
+	}
+
+	return it_stop->second / settings.bus_velocity;
 }
