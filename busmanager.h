@@ -9,6 +9,7 @@
 #include <string_view>
 #include <memory>
 #include <optional>
+#include <cmath>
 #include "bus.h"
 #include "command.h"
 #include "route.h"
@@ -27,56 +28,59 @@ private:
 	size_t last_init_id;
 	bool logging = true;
 
-	/*struct BusVertex{
-		std::string bus_name;
-		size_t vertex_id;
-
-		bool operator == (const BusVertex& other) const {
-			return bus_name == other.bus_name && vertex_id == other.vertex_id;
-		}
-	};
-
-	struct BusVertexHasher {
-		size_t operator() (const BusVertex& bv) const {
-			size_t x = 2'946'901;
-			return shash(bv.bus_name) * x + size_t_hash(bv.vertex_id);
-		}
-
-		std::hash<std::string> shash;
-		std::hash<size_t> size_t_hash;
-	};
-
-	struct BusStop{
-		std::string bus_name;
+	struct StopBuses{
 		std::string stop_name;
+		std::set<std::string> bus_set;
 
-		bool operator == (const BusStop& other) const {
-			return bus_name == other.bus_name && stop_name == other.stop_name;
+		bool operator == (const StopBuses& other) const {
+			return stop_name == other.stop_name && bus_set == other.bus_set;
 		}
 	};
 
-	struct BusStopHasher {
-		size_t operator() (const BusStop& bs) const {
+	struct StopBusesHasher {
+		size_t operator() (const StopBuses& e) const {
+			std::stringstream ss;
+			for(const std::string& bus_name: e.bus_set){
+				ss << bus_name << ' ';
+			}
+
 			size_t x = 2'946'901;
-			return shash(bs.bus_name) * x + shash(bs.stop_name);
+			return shash(e.stop_name)*x + shash(ss.str());
 		}
 
 		std::hash<std::string> shash;
-	};*/
+	};
 
-	std::unordered_map<std::string, std::unordered_set<size_t>> stop_to_vertex_list;
-	std::unordered_map<size_t, std::string> vertex_to_stop;
+	std::unordered_map<StopBuses, size_t, StopBusesHasher> stopbuses_to_vertex;
+	std::unordered_map<size_t, StopBuses> vertex_to_stopbuses;
 
-	//std::unordered_map<size_t, std::unordered_set<BusStop, BusStopHasher>> vertex_to_bus_stop;
-	//std::unordered_map<BusStop, size_t, BusStopHasher> bus_stop_to_vertex;
+	struct Stage {
+		std::string stop_from;
+		std::string stop_to;
+		double distance;
 
-	//std::unordered_map<std::string, std::unordered_set<BusVertex, BusVertexHasher>> stop_to_bus_vertex;
+		bool operator == (const Stage& other) const {
+			return stop_from == other.stop_from && stop_to == other.stop_to
+					&& abs(distance - other.distance) < 0.000001 ;
+		}
+	};
+
+	struct StageHasher {
+		size_t operator() (const Stage& e) const {
+			size_t x = 2'946'901;
+			return shash(e.stop_from)*x*x + shash(e.stop_to)*x + dhash(e.distance);
+		}
+
+		std::hash<std::string> shash;
+		std::hash<double> dhash;
+	};
+
+	mutable std::unordered_map<Stage, std::unordered_set<std::string>, StageHasher> stage_to_buses;
 
 	struct Edge {
 	    size_t from;
 	    size_t to;
 	    double distance;
-	    RouteItemType route_item_type;
 
 	    bool operator == (const Edge& other) const {
 			return from == other.from && to == other.to;
@@ -114,14 +118,10 @@ private:
 		const Graph::DirectedWeightedGraph<double>& graph,
 		Graph::Router<double>& router) const;
 
-	//void FillEdgesLine(const Bus& bus);
-	//void FillEdgesRound(const Bus& bus);
-
 	double GetDistance(std::vector<std::string>::const_iterator it) const;
 	void AddEdge(const Edge& edge);
 
-	void ProcessingStop(const std::string& stop_name, size_t stop_order);
-	void ProcessingStopBack(const std::string& stop_name, size_t stop_order);
-
 	double GetDistance(const std::string& stop_name, const std::string& stop_name_next) const;
+
+	void FillEdges();
 };

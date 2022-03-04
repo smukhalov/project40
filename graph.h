@@ -28,7 +28,6 @@ namespace Graph {
     VertexId from;
     VertexId to;
     Weight weight;
-    RouteItemType route_item_type;
   };
 
   template <typename Weight>
