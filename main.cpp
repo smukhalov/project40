@@ -9,7 +9,7 @@ using namespace std;
 int main(){
 	BusManager bm;
 
-	string inputFilePath = "/home/sergey/Books/coursera-c++brown-4/Экзамен - граф/transport-input1.json";
+	string inputFilePath = "/home/sergey/Books/coursera-c++brown-4/Экзамен - граф/transport-input3.json";
 	//string inputFilePath = "/home/sergey/Books/coursera-c++brown-4/Экзамен - граф/route-test-1.json";
 	ifstream input(inputFilePath, ios::binary);
 	if(!input){
@@ -34,7 +34,7 @@ int main(){
 		bm.WriteResponse(out_ss);
 	}
 
-	string outputFilePath = "/home/sergey/Books/coursera-c++brown-4/result1.json";
+	string outputFilePath = "/home/sergey/Books/coursera-c++brown-4/result3.json";
 	//string outputFilePath = "/home/sergey/Books/coursera-c++brown-4/test-result2.json";
 	ofstream output(outputFilePath, ios::binary);
 

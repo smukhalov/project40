@@ -592,10 +592,10 @@ void BusManager::FillBusEdges(){
 		}
 	}
 
-	/*for(const auto& [stop_buses, vertex]: stopbuses_to_vertex){
+	for(const auto& [stop_buses, vertex]: stopbuses_to_vertex){
 		std::cout << "stop_buses: [" << stop_buses.stop_name << ", " << stop_buses.bus_name
 				<< ", " << vertex << "]" << std::endl;
-	}*/
+	}
 }
 
 void BusManager::FillWaitEdges(){
@@ -609,8 +609,14 @@ void BusManager::FillWaitEdges(){
 		std::copy(vertex_set.begin(), vertex_set.end(), std::back_inserter(v));
 
 		for(size_t i = 0; i < count-1; i++){
-			AddEdge({v[i], v[i+1], settings.bus_wait_time});
-			AddEdge({v[i+1], v[i], settings.bus_wait_time});
+			for(size_t j = i+1; j < count; j++){
+				if(i == j){
+					continue;
+				}
+
+				AddEdge({v[i], v[j], settings.bus_wait_time});
+				AddEdge({v[j], v[i], settings.bus_wait_time});
+			}
 		}
 	}
 
@@ -640,9 +646,9 @@ void BusManager::FillWaitEdges(){
 
 		AddEdge({last_init_id, vertex_to, settings.bus_wait_time});
 
-		/*stop_to_vertex[stop_name_to].insert(last_init_id);
-		stopbuses_to_vertex.insert({{stop_name_to, bus_name}, last_init_id});
-		vertex_to_stopbuses.insert({last_init_id, {stop_name_to, bus_name}});*/
+		stop_to_vertex[stop_name_to].insert(last_init_id);
+		/*stopbuses_to_vertex.insert({{stop_name_to, bus_name}, last_init_id});*/
+		vertex_to_stopbuses.insert({last_init_id, {stop_name_to, bus_name}});
 
 		last_init_id++;
 	}

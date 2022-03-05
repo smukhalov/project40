@@ -26,7 +26,7 @@ public:
 
 private:
 	size_t last_init_id;
-	bool logging = false;
+	bool logging = true;
 
 	struct StopBuses{
 		std::string stop_name;
