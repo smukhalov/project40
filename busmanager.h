@@ -26,31 +26,33 @@ public:
 
 private:
 	size_t last_init_id;
-	bool logging = true;
+	bool logging = false;
 
 	struct StopBuses{
 		std::string stop_name;
-		std::set<std::string> bus_set;
+		std::string bus_name;
+		//std::set<std::string> bus_set;
 
 		bool operator == (const StopBuses& other) const {
-			return stop_name == other.stop_name && bus_set == other.bus_set;
+			return stop_name == other.stop_name && bus_name == other.bus_name;
 		}
 	};
 
 	struct StopBusesHasher {
 		size_t operator() (const StopBuses& e) const {
-			std::stringstream ss;
+			/*std::stringstream ss;
 			for(const std::string& bus_name: e.bus_set){
 				ss << bus_name << ' ';
-			}
+			}*/
 
 			size_t x = 2'946'901;
-			return shash(e.stop_name)*x + shash(ss.str());
+			return shash(e.stop_name)*x + shash(e.bus_name); // + shash(ss.str());
 		}
 
 		std::hash<std::string> shash;
 	};
 
+	std::unordered_map<std::string, std::unordered_set<size_t>> stop_to_vertex;
 	std::unordered_map<StopBuses, size_t, StopBusesHasher> stopbuses_to_vertex;
 	std::unordered_map<size_t, StopBuses> vertex_to_stopbuses;
 
@@ -119,9 +121,9 @@ private:
 		Graph::Router<double>& router) const;
 
 	double GetDistance(std::vector<std::string>::const_iterator it) const;
-	void AddEdge(const Edge& edge);
-
 	double GetDistance(const std::string& stop_name, const std::string& stop_name_next) const;
 
-	void FillEdges();
+	void AddEdge(const Edge& edge);
+	void FillBusEdges();
+	void FillWaitEdges();
 };
