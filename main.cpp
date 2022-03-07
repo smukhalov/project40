@@ -10,7 +10,7 @@ int main(){
 	BusManager bm;
 
 	string inputFilePath = "/home/sergey/Books/coursera-c++brown-4/Экзамен - граф/transport-input3.json";
-	//string inputFilePath = "/home/sergey/Books/coursera-c++brown-4/Экзамен - граф/route-test-1.json";
+	//string inputFilePath = "/home/sergey/Books/coursera-c++brown-4/Экзамен - граф/route-test-3.json";
 	ifstream input(inputFilePath, ios::binary);
 	if(!input){
 		std::cout << "Не найден файл шаблона " << inputFilePath <<'\n';
